@@ -19,6 +19,7 @@
         tools:replace="android:fullBackupContent"
         android:name=".MyApp"
         tools:targetApi="31">
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

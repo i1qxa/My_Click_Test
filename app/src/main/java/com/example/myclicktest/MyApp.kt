@@ -14,7 +14,7 @@ class MyApp:Application() {
         super.onCreate()
         val conversionDataListener  = object : AppsFlyerConversionListener {
             override fun onConversionDataSuccess(data: MutableMap<String, Any>?) {
-                var a = data
+                Log.d(APPS_LOG_TAG, data.toString())
             }
             override fun onConversionDataFail(error: String?) {
                 Log.e(APPS_LOG_TAG, "error onAttributionFailure :  $error")
