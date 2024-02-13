@@ -1,23 +1,28 @@
 package com.example.myclicktest.domain
 
+import com.example.myclicktest.data.db.AttributionDB
+
 const val APPS_CAMPAIGN = "campaign"
 data class Attribution(
-    val userType:UserType,
-    val campaign:String?,
+    val isNonOrganic:Boolean,
+    val sub1:String?,
+    val sub2:String?,
+    val sub3:String?,
+    val sub4:String?,
+    val sub5:String?,
+    val sub6:String?,
 ){
-    val campaignAsList:List<String>?
-        get() = campaign?.split("_")
-    val sub1:String?
-        get() = campaignAsList?.get(0)
-    val sub2:String?
-        get() = campaignAsList?.get(1)
-    val sub3:String?
-        get() = campaignAsList?.get(2)
-    val sub4:String?
-        get() = campaignAsList?.get(3)
-    val sub5:String?
-        get() = campaignAsList?.get(4)
-    val sub6:String?
-        get() = campaignAsList?.get(5)
-
+    companion object{
+        fun setupAttributionFromAttributionDB(attributionDB: AttributionDB):Attribution{
+            return Attribution(
+                isNonOrganic = attributionDB.isNonOrganic,
+                sub1 = attributionDB.sub1,
+                sub2 = attributionDB.sub2,
+                sub3 = attributionDB.sub3,
+                sub4 = attributionDB.sub4,
+                sub5 = attributionDB.sub5,
+                sub6 = attributionDB.sub6,
+            )
+        }
+    }
 }
