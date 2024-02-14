@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -34,7 +35,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
 }
@@ -47,11 +48,14 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     //SDK'S
-    implementation ("com.appsflyer:af-android-sdk:6.12.6")
-    implementation ("com.android.installreferrer:installreferrer:2.2")
-    implementation ("com.facebook.android:facebook-android-sdk:16.0.0")
+    implementation("com.appsflyer:af-android-sdk:6.12.6")
+    implementation("com.android.installreferrer:installreferrer:2.2")
+    implementation("com.facebook.android:facebook-android-sdk:16.0.0")
     //Room
     implementation("androidx.room:room-runtime:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-config")
 }

@@ -1,8 +1,8 @@
-package com.example.myclicktest.data.db
+package com.example.myclicktest.data.db.attribution
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.myclicktest.domain.APPS_CAMPAIGN_PARAM_NAME
+import java.lang.StringBuilder
 
 @Entity
 data class AttributionDB(
@@ -16,8 +16,22 @@ data class AttributionDB(
     val sub5:String?,
     val sub6:String?,
 ){
+    fun getParamsString():String{
+        val paramsSB = StringBuilder()
+        paramsSB.apply {
+            append("?")
+            append("sub1=${sub1?:""}")
+            append("&sub2=${sub2?:""}")
+            append("&sub3=${sub3?:""}")
+            append("&sub4=${sub4?:""}")
+            append("&sub5=${sub5?:""}")
+            append("&sub6=${sub6?:""}")
+
+        }
+        return paramsSB.toString()
+    }
     companion object{
-        fun setupAttribution(campaign:String?):AttributionDB{
+        fun setupAttribution(campaign:String?): AttributionDB {
             if(campaign?.isNotEmpty()?:false){
                 val campaignAsList = campaign?.split("_")
                 return AttributionDB(

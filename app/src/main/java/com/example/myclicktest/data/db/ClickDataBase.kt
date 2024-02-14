@@ -4,11 +4,16 @@ import android.app.Application
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.myclicktest.data.db.attribution.AttributionDB
+import com.example.myclicktest.data.db.attribution.AttributionDao
+import com.example.myclicktest.data.db.link.LinkDB
+import com.example.myclicktest.data.db.link.LinkDao
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @Database(
     entities = [
-        AttributionDB::class
+        AttributionDB::class,
+        LinkDB::class,
     ],
     exportSchema = false,
     version = 1
@@ -16,6 +21,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 abstract class ClickDataBase: RoomDatabase() {
 
     abstract fun attributionDao(): AttributionDao
+    abstract fun linkDao():LinkDao
 
     companion object {
         private var INSTANCE: ClickDataBase? = null

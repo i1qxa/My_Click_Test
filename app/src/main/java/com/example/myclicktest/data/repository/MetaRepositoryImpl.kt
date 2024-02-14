@@ -1,7 +1,7 @@
 package com.example.myclicktest.data.repository
 
 import android.app.Application
-import com.example.myclicktest.data.db.AttributionDB
+import com.example.myclicktest.data.db.attribution.AttributionDB
 import com.example.myclicktest.data.db.ClickDataBase
 import com.facebook.applinks.AppLinkData
 import kotlinx.coroutines.CoroutineScope

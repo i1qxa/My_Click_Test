@@ -5,15 +5,13 @@ import android.util.Log
 import com.appsflyer.AppsFlyerConversionListener
 import com.appsflyer.AppsFlyerLib
 import com.appsflyer.attribution.AppsFlyerRequestListener
-import com.example.myclicktest.data.db.AttributionDB
+import com.example.myclicktest.data.db.attribution.AttributionDB
 import com.example.myclicktest.data.db.ClickDataBase
 import com.example.myclicktest.domain.APPSFLYER_DEV_KEY
 import com.example.myclicktest.domain.APPS_CAMPAIGN_PARAM_NAME
 import com.example.myclicktest.domain.APPS_LOG_TAG
-import com.example.myclicktest.domain.WAITING_TIME_IN_MILS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AppsFlyerRepositoryImpl(private val application: Application) {
@@ -28,7 +26,7 @@ class AppsFlyerRepositoryImpl(private val application: Application) {
                     CoroutineScope(Dispatchers.IO).launch {
                         dao.saveAttribution(
                             AttributionDB.setupAttribution(
-                                data[APPS_CAMPAIGN_PARAM_NAME]?.toString()?:null
+                                data[APPS_CAMPAIGN_PARAM_NAME]?.toString()
                             )
                         )
                     }

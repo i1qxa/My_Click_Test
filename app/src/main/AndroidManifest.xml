@@ -7,6 +7,7 @@
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
+        android:name=".MyApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,11 +18,17 @@
         android:theme="@style/Theme.MyClickTest"
         android:usesCleartextTraffic="true"
         tools:replace="android:fullBackupContent"
-        android:name=".MyApp"
         tools:targetApi="31">
-        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.WhiteActivity"
+            android:exported="false" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name=".ui.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
