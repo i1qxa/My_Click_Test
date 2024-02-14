@@ -18,7 +18,7 @@ interface LinkDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveLink(link:LinkDB)
 
-    @Query("DELETE FROM LinkDB WHERE id = 1")
-    suspend fun removeLink()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun setEmptyLink(link:LinkDB)
 
 }

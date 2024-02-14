@@ -13,7 +13,6 @@ class MyApp : Application() {
 
     private val attributionRepositoryImpl by lazy { AttributionRepositoryImpl(this) }
     private val attributionDao by lazy { ClickDataBase.getInstance(this).attributionDao() }
-    private val linkDao by lazy { ClickDataBase.getInstance(this).linkDao() }
     private val linkRepositoryImpl by lazy { LinkRepositoryImpl(this) }
     override fun onCreate() {
         super.onCreate()

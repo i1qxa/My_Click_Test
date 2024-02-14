@@ -35,7 +35,7 @@ class LinkRepositoryImpl(private val application: Application) {
                     val baseLink = remoteConfig.getString(linkType)
                     if (baseLink.isEmpty()) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            linkDao.removeLink()
+                            linkDao.setEmptyLink(LinkDB(1,"",null,null))
                         }
                     }else{
                         CoroutineScope(Dispatchers.IO).launch {
