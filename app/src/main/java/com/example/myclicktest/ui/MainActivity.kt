@@ -2,12 +2,15 @@ package com.example.myclicktest.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +36,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         observeViewModel()
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        webView.restoreState(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        webView.saveState(outState)
     }
 
     private val fileUploadActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -65,6 +78,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     val myWebChromeClient = object : WebChromeClient() {
+
+        private var customView: View? = null
+        private var customViewCallback: CustomViewCallback? = null
+        private var originalOrientation = 0
+        private val fullscreenContainer: FrameLayout? = null
+        private val activity: Activity? = null
+
         override fun onShowFileChooser(
             webView: WebView?,
             filePathCallback: ValueCallback<Array<Uri>>?,
@@ -74,6 +94,38 @@ class MainActivity : AppCompatActivity() {
             val intent = fileChooserParams?.createIntent()
             fileUploadActivityResultLauncher.launch(intent)
             return true
+        }
+        override fun onHideCustomView() {
+            if (customView == null) {
+                return
+            }
+            fullscreenContainer?.removeView(customView)
+            fullscreenContainer?.setVisibility(View.GONE)
+            customView = null
+            customViewCallback?.onCustomViewHidden()
+            this@MainActivity.setRequestedOrientation(originalOrientation)
+            this@MainActivity.getWindow()?.getDecorView()?.setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE)
+        }
+
+        override fun onShowCustomView(view: View, callback: CustomViewCallback) {
+            if (customView != null) {
+                onHideCustomView()
+                return
+            }
+            customView = view
+            originalOrientation = this@MainActivity.getRequestedOrientation()
+            customViewCallback = callback
+            fullscreenContainer?.addView(
+                customView,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
+            )
+            fullscreenContainer?.setVisibility(View.VISIBLE)
+            this@MainActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            this@MainActivity.getWindow().getDecorView()
+                .setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN)
         }
     }
 
@@ -85,6 +137,7 @@ class MainActivity : AppCompatActivity() {
                 domStorageEnabled = true
                 javaScriptEnabled = true
                 allowFileAccess = true
+                javaScriptCanOpenWindowsAutomatically = true
                 setSupportMultipleWindows(true)
             }
             webChromeClient = myWebChromeClient

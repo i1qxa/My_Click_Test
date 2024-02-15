@@ -22,7 +22,6 @@ class MyWebViewClient(private val linkRepo: LinkRepositoryImpl,private val conte
     }
 
     override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
-        // Handle downloads from the WebView
         val url = request?.url.toString()
         if (url?.endsWith(".jpg") == true || url?.endsWith(".png") == true || url?.endsWith(".gif") == true) {
             val connection = URL(url).openConnection() as HttpURLConnection
