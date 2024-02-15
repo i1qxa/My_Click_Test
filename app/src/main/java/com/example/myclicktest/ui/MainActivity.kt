@@ -1,5 +1,6 @@
 package com.example.myclicktest.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
@@ -17,8 +19,11 @@ import com.example.myclicktest.databinding.ActivityMainBinding
 import com.example.myclicktest.ui.web.MyWebViewClient
 import kotlinx.coroutines.launch
 
+
 private const val REQ_CODE = 666
 class MainActivity : AppCompatActivity() {
+
+    private var fileUploadCallback: ValueCallback<Array<Uri>>? = null
 
     private val binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
     private val viewModel by lazy { ViewModelProvider(this)[MainViewModel::class.java] }
@@ -29,17 +34,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         observeViewModel()
     }
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (requestCode == REQ_CODE) {
-            val mFilePathCallbackCurr = mFilePathCallback
-            if (mFilePathCallbackCurr == null) {
-                return
-            } else {
-                mFilePathCallbackCurr.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, intent))
-                mFilePathCallbackCurr = null
-            }
+
+    private val fileUploadActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val results = result.data?.let { WebChromeClient.FileChooserParams.parseResult(result.resultCode, it) }
+            fileUploadCallback?.onReceiveValue(results)
+        } else {
+            fileUploadCallback?.onReceiveValue(null)
         }
+        fileUploadCallback = null
     }
+
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {
@@ -58,6 +64,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    val myWebChromeClient = object : WebChromeClient() {
+        override fun onShowFileChooser(
+            webView: WebView?,
+            filePathCallback: ValueCallback<Array<Uri>>?,
+            fileChooserParams: FileChooserParams?
+        ): Boolean {
+            fileUploadCallback = filePathCallback ?: return false
+            val intent = fileChooserParams?.createIntent()
+            fileUploadActivityResultLauncher.launch(intent)
+            return true
+        }
+    }
+
     private fun launchWebView(link:String) {
         binding.progressLoading.visibility = View.GONE
         webView.apply {
@@ -66,10 +85,10 @@ class MainActivity : AppCompatActivity() {
                 domStorageEnabled = true
                 javaScriptEnabled = true
                 allowFileAccess = true
-                allowFileAccess = true
+                setSupportMultipleWindows(true)
             }
-            webViewClient = MyWebViewClient(LinkRepositoryImpl(application))
-            webChromeClient
+            webChromeClient = myWebChromeClient
+            webViewClient = MyWebViewClient(LinkRepositoryImpl(application),this@MainActivity)
             onBackPressedDispatcher.addCallback(onBackBehavior)
         }
         binding.constraintMain.addView(webView)
@@ -78,30 +97,6 @@ class MainActivity : AppCompatActivity() {
             width = ConstraintLayout.LayoutParams.MATCH_PARENT
         }
     }
-
-    val MywebChromeClient = object : WebChromeClient() {
-
-        //        override fun onShowFileChooser(
-//            webView: WebView?,
-//            filePathCallback: ValueCallback<Array<Uri>>?,
-//            fileChooserParams: FileChooserParams?
-//        ): Boolean {
-//            if(fileChooserParams!=null){
-//                filePathCallback
-//                val intent = fileChooserParams.createIntent()
-//                startActivityForResult(intent, REQ_CODE)
-//            }
-//            return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
-//        }
-        override fun onShowFileChooser(
-            webView: WebView?,
-            filePathCallback: ValueCallback<Array<Uri>>?,
-            fileChooserParams: FileChooserParams?
-        ): Boolean {
-            return super.onShowFileChooser(webView, filePathCallback, fileChooserParams)
-        }
-    }
-
 
 
 
