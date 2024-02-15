@@ -1,8 +1,11 @@
 package com.example.myclicktest.data.repository
 
 import android.app.Application
+import com.example.myclicktest.R
 import com.example.myclicktest.data.db.attribution.AttributionDB
 import com.example.myclicktest.data.db.ClickDataBase
+import com.facebook.FacebookSdk
+import com.facebook.FacebookSdk.sdkInitialize
 import com.facebook.applinks.AppLinkData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +15,8 @@ class MetaRepositoryImpl(private val application: Application) {
 
     private val dao by lazy { ClickDataBase.getInstance(application).attributionDao() }
     fun fetchDataFromMeta() {
+        FacebookSdk.setClientToken(application.getString(R.string.facebook_app_id))
+        sdkInitialize(application)
         AppLinkData.fetchDeferredAppLinkData(
             application,
             AppLinkData.CompletionHandler { appLinkData ->

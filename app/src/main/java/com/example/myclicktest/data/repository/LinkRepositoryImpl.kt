@@ -20,6 +20,15 @@ class LinkRepositoryImpl(private val application: Application) {
     private val linkDao by lazy { ClickDataBase.getInstance(application).linkDao() }
     private val attributionDao by lazy { ClickDataBase.getInstance(application).attributionDao() }
 
+    fun updateLastLink(url: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val linkDb = linkDao.getLink()
+            if (linkDb!=null){
+                linkDao.saveLink(linkDb.copy(lastLink = url))
+            }
+        }
+    }
+
     fun fetchBaseLink(isNonOrganic: Boolean) {
         val linkType = if (isNonOrganic) FIREBASE_NON_ORGANIC_LINK else FIREBASE_ORGANIC_LINK
         val remoteConfig = Firebase.remoteConfig
@@ -35,12 +44,13 @@ class LinkRepositoryImpl(private val application: Application) {
                     val baseLink = remoteConfig.getString(linkType)
                     if (baseLink.isEmpty()) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            linkDao.setEmptyLink(LinkDB(1,"",null,null))
+                            linkDao.setEmptyLink(LinkDB(1, "", null, null))
                         }
-                    }else{
+                    } else {
                         CoroutineScope(Dispatchers.IO).launch {
-                            val baseLinkWithParams = baseLink+attributionDao.getAttributionDB().getParamsString()
-                            linkDao.saveLink(LinkDB(1,baseLink,baseLinkWithParams,baseLink))
+                            val baseLinkWithParams =
+                                baseLink + attributionDao.getAttributionDB().getParamsString()
+                            linkDao.saveLink(LinkDB(1, baseLink, baseLinkWithParams, baseLink))
                         }
                     }
                 }
