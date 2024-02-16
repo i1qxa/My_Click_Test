@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">My Click Test</string>
     <string name="facebook_app_id">8298446606838097</string>
+    <string name="error_opening_app">Error opening app</string>
 </resources>

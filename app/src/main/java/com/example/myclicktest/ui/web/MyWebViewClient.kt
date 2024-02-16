@@ -6,8 +6,11 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
+import com.example.myclicktest.R
 import com.example.myclicktest.data.repository.LinkRepositoryImpl
+import java.lang.Exception
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -59,7 +62,11 @@ class MyWebViewClient(private val linkRepo: LinkRepositoryImpl,private val conte
             }
         }
         return if (intent!=null){
-            startActivity(context, intent!!, null)
+            try {
+                startActivity(context, intent!!, null)
+            }catch (e:Exception){
+                Toast.makeText(context, R.string.error_opening_app,Toast.LENGTH_SHORT).show()
+            }
             true
         }else{
             false
