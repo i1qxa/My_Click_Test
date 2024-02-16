@@ -2,7 +2,6 @@ package com.example.myclicktest.ui.web
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
@@ -14,10 +13,20 @@ import java.net.URL
 
 class MyWebViewClient(private val linkRepo: LinkRepositoryImpl,private val context: Context) : WebViewClient() {
 
+    private val listOfCustomLinkData by lazy {
+        listOf(
+            CustomLinkData("tg://", Intent.ACTION_VIEW, "org.telegram.messenger"),
+            CustomLinkData("tg:resolve", "", null),
+            CustomLinkData("viber://", Intent.ACTION_VIEW, "com.viber.voip"),
+            CustomLinkData("whatsapp://", Intent.ACTION_VIEW, "com.whatsapp"),
+            CustomLinkData("mailto", Intent.ACTION_SENDTO, null),
+            CustomLinkData("tel://", Intent.ACTION_DIAL, null),
+            )
+    }
     override fun onPageFinished(view: WebView?, url: String?) {
         super.onPageFinished(view, url)
         if (url != null) {
-//            linkRepo.updateLastLink(url)
+            linkRepo.updateLastLink(url)
         }
     }
 
@@ -33,31 +42,27 @@ class MyWebViewClient(private val linkRepo: LinkRepositoryImpl,private val conte
     }
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-        if(checkUrl(request?.url.toString())){
-            return true
-        }else return super.shouldOverrideUrlLoading(view, request)
+        return if(checkUrl(request?.url.toString())){
+            true
+        }else
+            super.shouldOverrideUrlLoading(view, request)
     }
 
-    private fun checkUrl(url:String):Boolean{
-        val intent = if (url.contains("tg://")){
-            Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage("org.telegram.messenger")
-        }else if (url.contains("viber://")){
-            Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage("com.viber.voip")
-        }else if (url.contains("whatsapp://")){
-            Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage("com.whatsapp")
-        }else if (url.contains("mailto")){
-            Intent(Intent.ACTION_SENDTO, Uri.parse(url))
-        }else if (url.contains("tel://")){
-            Intent(Intent.ACTION_DIAL, Uri.parse(url))
-        }else{
-            null
-        }
 
-        if (intent!=null){
-            startActivity(context, intent, null)
-            return true
+    private fun checkUrl(url:String):Boolean{
+
+        var intent:Intent? = null
+        listOfCustomLinkData.map {
+            if (url.contains(it.keyWord)) {
+                if (it.intentKey.isEmpty()) return true
+                intent = it.getIntent(url)
+            }
+        }
+        return if (intent!=null){
+            startActivity(context, intent!!, null)
+            true
         }else{
-            return false
+            false
         }
     }
 }
